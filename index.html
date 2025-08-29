@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-viewport, initial-scale=1.0">
 <title>Map Display</title>
 <style>
   body {
@@ -24,63 +24,85 @@
     display: block;
   }
   #sprite {
-    width: Width of sprite: 1:38 ratio according to the map width*/
-    height: Height of sprite maintaining 1:2 ratio according to the width of sprite*/
     position: absolute;
     background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
     background-image: url('https://raw.githubusercontent.com/enoch-sit/publicimages/refs/heads/main/facingNorth.png');
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 10;
   }
 </style>
 </head>
 <body>
 <div id="map-container">
   <img id="map" src="https://raw.githubusercontent.com/enoch-sit/publicimages/refs/heads/main/map2.png" alt="Map of a specific location">
-  
-please add a sprite above the map image
-for sprite control, using keyboard arrow to control.
-Use the following character (when press up) show this:
-https://raw.githubusercontent.com/enoch-sit/publicimages/refs/heads/main/facingNorth.png
-
-Use the following character (when press right) show this:
-https://raw.githubusercontent.com/enoch-sit/publicimages/refs/heads/main/facingEast.png
-
-Use the following character (when press down) show this:
-https://raw.githubusercontent.com/enoch-sit/publicimages/refs/heads/main/facingSouth.png
-
-Use the following character (when press left) show this:
-https://raw.githubusercontent.com/enoch-sit/publicimages/refs/heads/main/facingWest.png
-
-<div id="sprite"></div>
+  <div id="sprite"></div>
 </div>
+
 <script>
   const sprite = document.getElementById('sprite');
+  const mapContainer = document.getElementById('map-container');
+  const mapImage = document.getElementById('map');
   let spriteX = 50; // Starting position (percentage)
   let spriteY = 50; // Starting position (percentage)
+
+  function setSpriteSize() {
+    const mapWidth = mapImage.offsetWidth;
+    const mapHeight = mapImage.offsetHeight;
+    
+    // Set sprite width to 1/15 of map width (much bigger than 1/38)
+    const spriteWidth = mapWidth / 15;
+    // Set sprite height to maintain 1:2 ratio (width * 2)
+    const spriteHeight = spriteWidth * 2;
+    
+    sprite.style.width = `${spriteWidth}px`;
+    sprite.style.height = `${spriteHeight}px`;
+  }
+
+  // Set initial sprite size when map loads
+  mapImage.addEventListener('load', setSpriteSize);
+  
+  // Update sprite size on window resize (important for iframe responsiveness)
+  window.addEventListener('resize', setSpriteSize);
+  
+  // Set sprite size immediately if image is already loaded
+  if (mapImage.complete) {
+    setSpriteSize();
+  }
 
   document.addEventListener('keydown', (event) => {
     switch (event.key) {
       case 'ArrowUp':
-        spriteY = Math.max(0, spriteY - 5);
+        spriteY = Math.max(5, spriteY - 5); // Keep sprite within bounds
         sprite.style.backgroundImage = "url('https://raw.githubusercontent.com/enoch-sit/publicimages/refs/heads/main/facingNorth.png')";
         break;
       case 'ArrowDown':
-        spriteY = Math.min(100, spriteY + 5);
+        spriteY = Math.min(95, spriteY + 5); // Keep sprite within bounds
         sprite.style.backgroundImage = "url('https://raw.githubusercontent.com/enoch-sit/publicimages/refs/heads/main/facingSouth.png')";
         break;
       case 'ArrowLeft':
-        spriteX = Math.max(0, spriteX - 5);
+        spriteX = Math.max(5, spriteX - 5); // Keep sprite within bounds
         sprite.style.backgroundImage = "url('https://raw.githubusercontent.com/enoch-sit/publicimages/refs/heads/main/facingWest.png')";
         break;
       case 'ArrowRight':
-        spriteX = Math.min(100, spriteX + 5);
+        spriteX = Math.min(95, spriteX + 5); // Keep sprite within bounds
         sprite.style.backgroundImage = "url('https://raw.githubusercontent.com/enoch-sit/publicimages/refs/heads/main/facingEast.png')";
         break;
     }
     sprite.style.top = `${spriteY}%`;
     sprite.style.left = `${spriteX}%`;
+  });
+
+  // Enable keyboard controls for iframe
+  document.body.tabIndex = 0;
+  document.body.focus();
+  
+  // Ensure focus when clicked (important for iframe)
+  document.body.addEventListener('click', () => {
+    document.body.focus();
   });
 </script>
 </body>
